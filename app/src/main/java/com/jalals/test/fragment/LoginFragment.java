@@ -48,6 +48,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        Log.v("TEST", "onClick!!!!");
         requestAccessToken();
     }
 
@@ -67,10 +68,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                 return;
                             }
 
-                            SharedPreferences settings = getActivity().getSharedPreferences(AppController.APP_PREFERENCES, 0);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putString(AppController.PREFS_ACCESS_TOKEN, token);
-                            editor.commit();
+                            saveToken(token);
                         }
                         catch (JSONException e) {
                             e.printStackTrace();
@@ -87,5 +85,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         );
 
         AppController.getInstance().addToRequestQueue(jsonObjReq);
+    }
+
+    private void saveToken(String token) {
+        SharedPreferences prefs = getActivity().getSharedPreferences(AppController.APP_PREFERENCES, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(AppController.PREFS_ACCESS_TOKEN, token);
+        editor.commit();
     }
 }
