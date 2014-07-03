@@ -11,6 +11,9 @@ public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
 
+    public static final String APP_PREFERENCES = "shared_preferences";
+    public static final String PREFS_ACCESS_TOKEN = "access_token";
+
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
 
