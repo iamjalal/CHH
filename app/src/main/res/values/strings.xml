@@ -9,4 +9,6 @@
 
     <string name="button_login">Login to Twitter</string>
 
+    <string name="logout">Logout</string>
+
 </resources>

@@ -13,6 +13,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.jalals.test.activity.MainActivity;
 import com.jalals.test.app.AppController;
 import com.jalals.test.app.R;
 import com.jalals.test.model.Twitter;
@@ -48,13 +49,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Log.v("TEST", "onClick!!!!");
         requestAccessToken();
     }
 
     private void requestAccessToken() {
 
-        StringRequest jsonObjReq = new TokenRequest(Request.Method.POST, Twitter.URLs.TOKEN_URL,
+        StringRequest request = new TokenRequest(Request.Method.POST, Twitter.URLs.TOKEN_URL,
                 new Response.Listener<String>() {
 
                     @Override
@@ -62,13 +62,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String token = jsonObject.optString(Twitter.JSON.ACCESS_TOKEN);
-                            Log.v("TEST", "Access token: "+token);
 
                             if(token == null) {
                                 return;
                             }
 
                             saveToken(token);
+                            ((MainActivity)getActivity()).showTweetsFragment();
                         }
                         catch (JSONException e) {
                             e.printStackTrace();
@@ -84,7 +84,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 }
         );
 
-        AppController.getInstance().addToRequestQueue(jsonObjReq);
+        AppController.getInstance().addToRequestQueue(request);
     }
 
     private void saveToken(String token) {
