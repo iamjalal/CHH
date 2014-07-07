@@ -6,13 +6,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -29,7 +28,8 @@ import org.json.JSONObject;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
-    ImageView progressLogo;
+    private ImageView mProgressLogo;
+    private TextView mAuthMessage;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -51,7 +51,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Button loginButton = (Button)view.findViewById(R.id.login_button);
         loginButton.setOnClickListener(this);
 
-        progressLogo = (ImageView)view.findViewById(R.id.progress_logo);
+        mProgressLogo = (ImageView)view.findViewById(R.id.progress_logo);
+        mAuthMessage = (TextView)view.findViewById(R.id.auth_message);
 
         return view;
     }
@@ -63,6 +64,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private void requestAccessToken() {
 
+        mAuthMessage.setText(getResources().getText(R.string.login_progress));
         startProgressAnimation();
 
         StringRequest request = new TokenRequest(Request.Method.POST, Twitter.URLs.TOKEN_URL,
@@ -80,6 +82,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                             saveToken(token);
                             stopProgressAnimation();
+                            mAuthMessage.setText(getResources().getText(R.string.login_progress));
 
                             ((MainActivity)getActivity()).showTweetsFragment();
                         }
@@ -116,10 +119,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         anim.setRepeatCount(Animation.INFINITE);
         anim.setDuration(1800);
 
-        progressLogo.startAnimation(anim);
+        mProgressLogo.startAnimation(anim);
     }
 
     private void stopProgressAnimation() {
-        progressLogo.setAnimation(null);
+        mProgressLogo.setAnimation(null);
     }
 }
