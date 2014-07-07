@@ -25,7 +25,7 @@ public class TweetsAdapter extends BaseAdapter {
         mContext = context;
     }
 
-    public void setEntries(ArrayList<Tweet> tweets) {
+    public void setEntries(List<Tweet> tweets) {
         mTweets = tweets;
         notifyDataSetChanged();
     }

@@ -1,9 +1,7 @@
 package com.jalals.test.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,9 +31,18 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TweetsFragment extends Fragment {
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-    TweetsAdapter adapter;
+public class TweetsFragment extends Fragment implements  OnRefreshListener {
+
+    private static final String TWEET_LIST = "tweetList";
+
+    private PullToRefreshLayout mRootLayout;
+    private TweetsAdapter mAdapter;
+
+    private List<Tweet> mTweets;
 
     public static TweetsFragment newInstance() {
         TweetsFragment fragment = new TweetsFragment();
@@ -48,6 +55,10 @@ public class TweetsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if(savedInstanceState != null) {
+            mTweets = savedInstanceState.getParcelableArrayList(TWEET_LIST);
+        }
     }
 
     @Override
@@ -55,14 +66,25 @@ public class TweetsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tweets, container, false);
 
-        adapter = new TweetsAdapter(getActivity());
-        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(adapter);
+        mAdapter = new TweetsAdapter(getActivity());
+        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
 
         ListView tweetList = (ListView) view.findViewById(R.id.tweet_list);
         animationAdapter.setAbsListView(tweetList);
         tweetList.setAdapter(animationAdapter);
 
-        loadTweets(Twitter.Values.SCREEN_NAME);
+        mRootLayout = (PullToRefreshLayout) view.findViewById(R.id.root_layout);
+
+        ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
+                .listener(this).setup(mRootLayout);
+
+        if(mTweets == null) {
+            loadTweets();
+        }
+        else {
+            updateUi();
+        }
+
         return view;
     }
 
@@ -82,10 +104,12 @@ public class TweetsFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadTweets(String query) {
+    private void loadTweets() {
+
+        mRootLayout.setRefreshing(true);
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair(Twitter.JSON.SCREEN_NAME, query));
+        params.add(new BasicNameValuePair(Twitter.JSON.SCREEN_NAME, Twitter.Values.SCREEN_NAME));
 
         JsonArrayRequest request = new TweetsRequest(Twitter.URLs.TWEETS_URL,
             new Response.Listener<JSONArray>() {
@@ -93,6 +117,9 @@ public class TweetsFragment extends Fragment {
             @Override
             public void onResponse(JSONArray response) {
                 try {
+                    if(mRootLayout.isRefreshing()) {
+                        mRootLayout.setRefreshComplete();
+                    }
                     parseTweets(response);
                 }
                 catch (JSONException e) {
@@ -100,10 +127,13 @@ public class TweetsFragment extends Fragment {
                 }
             }
         },
-        new Response.ErrorListener() {
+            new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                if(mRootLayout.isRefreshing()) {
+                    mRootLayout.setRefreshComplete();
+                }
                 error.printStackTrace();
             }
         }, params, ((MainActivity)getActivity()).getAccessToken());
@@ -113,10 +143,13 @@ public class TweetsFragment extends Fragment {
 
     private void parseTweets(JSONArray response) throws JSONException {
 
+        mTweets = new ArrayList<Tweet>();
+        mAdapter.setEntries(mTweets);
+
         int count = response != null ? response.length() : 0;
         for(int i = 0; i < count; i++) {
             Tweet tweet = new Tweet(response.getJSONObject(i));
-            adapter.add(tweet);
+            mTweets.add(tweet);
         }
     }
 
@@ -126,5 +159,24 @@ public class TweetsFragment extends Fragment {
             act.showLoginFragment();
             act.resetAccessToken();
         }
+    }
+
+    private void updateUi() {
+
+        if(mAdapter == null) {
+            mAdapter = new TweetsAdapter(getActivity());
+        }
+
+        mAdapter.setEntries(mTweets);
+    }
+
+    @Override
+    public void onRefreshStarted(View view) {
+        loadTweets();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelableArrayList(TWEET_LIST, new ArrayList<Tweet>(mTweets));
     }
 }

@@ -1,6 +1,7 @@
 package com.jalals.test.activity;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,8 @@ import com.jalals.test.fragment.LoginFragment;
 import com.jalals.test.fragment.TweetsFragment;
 
 public class MainActivity extends Activity {
+
+    private static final String TAG_TWEETS = "tweets";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +31,23 @@ public class MainActivity extends Activity {
     }
 
     public void showLoginFragment() {
+
         LoginFragment fragment = LoginFragment.newInstance();
         getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,
                 android.R.animator.fade_out).replace(R.id.fragment_container, fragment).commit();
     }
 
     public void showTweetsFragment() {
-        TweetsFragment fragment = TweetsFragment.newInstance();
-        getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,
-                android.R.animator.fade_out).replace(R.id.fragment_container, fragment).commit();
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        TweetsFragment fragment = (TweetsFragment) fragmentManager.findFragmentByTag(TAG_TWEETS);
+        if(fragment == null) {
+            fragment = TweetsFragment.newInstance();
+        }
+
+        fragmentManager.beginTransaction().setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out).replace(R.id.fragment_container, fragment, TAG_TWEETS).commit();
     }
 
     public String getAccessToken() {

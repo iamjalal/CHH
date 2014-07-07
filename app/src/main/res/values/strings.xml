@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">TweetFeeder</string>
+    <string name="app_name">Creative HotHouse</string>
     <string name="action_settings">Settings</string>
     <string name="login_progress">Logging in to Twitter...</string>
     <string name="login_successful">Logged in</string>

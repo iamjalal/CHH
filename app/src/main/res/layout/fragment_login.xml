@@ -6,23 +6,42 @@
 
     <Button
         android:id="@+id/login_button"
-        android:layout_width="240dp"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_button"
         android:layout_centerInParent="true"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/button_login"
-        android:textStyle="bold"/>
+        android:layout_marginBottom="16dp"/>
 
     <ImageView
-        android:id="@+id/progress_logo"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_twitter"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="24dp"
-        android:layout_above="@+id/login_button"
-        android:scaleType="fitCenter"
-        android:src="@drawable/chh_logo"/>
+        android:paddingRight="8dp"
+        android:layout_above="@+id/login_button">
+
+        <ImageView
+            android:id="@+id/progress_logo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitCenter"
+            android:src="@drawable/chh_logo"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_above="@+id/login_button"
+            android:src="@drawable/chh_banner"/>
+    </LinearLayout>
+
 
 </RelativeLayout>
