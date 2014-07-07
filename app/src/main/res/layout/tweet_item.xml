@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:padding="8dp">
 
     <com.android.volley.toolbox.NetworkImageView
@@ -25,7 +26,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:text="Creative HotHouse"
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:textSize="16sp"/>
@@ -34,7 +34,6 @@
             android:id="@+id/tweet_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is a short message that will post as a tweet, it should be about 124 characters long. Let me write a bit more to make the view fuller."
             android:textColor="@android:color/black"
             android:textSize="14dp"/>
     </LinearLayout>

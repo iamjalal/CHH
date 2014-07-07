@@ -29,14 +29,14 @@ public class MainActivity extends Activity {
 
     public void showLoginFragment() {
         LoginFragment fragment = LoginFragment.newInstance();
-        getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment).commit();
+        getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out).replace(R.id.fragment_container, fragment).commit();
     }
 
     public void showTweetsFragment() {
         TweetsFragment fragment = TweetsFragment.newInstance();
-        getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment).commit();
+        getFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out).replace(R.id.fragment_container, fragment).commit();
     }
 
     public String getAccessToken() {

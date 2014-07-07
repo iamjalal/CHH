@@ -3,11 +3,16 @@ package com.jalals.test.fragment;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -23,6 +28,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
+
+    ImageView progressLogo;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -44,6 +51,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Button loginButton = (Button)view.findViewById(R.id.login_button);
         loginButton.setOnClickListener(this);
 
+        progressLogo = (ImageView)view.findViewById(R.id.progress_logo);
+
         return view;
     }
 
@@ -53,6 +62,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void requestAccessToken() {
+
+        startProgressAnimation();
 
         StringRequest request = new TokenRequest(Request.Method.POST, Twitter.URLs.TOKEN_URL,
                 new Response.Listener<String>() {
@@ -68,6 +79,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             }
 
                             saveToken(token);
+                            stopProgressAnimation();
+
                             ((MainActivity)getActivity()).showTweetsFragment();
                         }
                         catch (JSONException e) {
@@ -79,6 +92,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        stopProgressAnimation();
                         error.printStackTrace();
                     }
                 }
@@ -88,9 +102,24 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void saveToken(String token) {
-        SharedPreferences prefs = getActivity().getSharedPreferences(AppController.APP_PREFERENCES, 0);
+        SharedPreferences prefs = getActivity().getSharedPreferences(
+                AppController.APP_PREFERENCES, 0);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(AppController.PREFS_ACCESS_TOKEN, token);
         editor.commit();
+    }
+
+    private void startProgressAnimation() {
+        RotateAnimation anim = new RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setDuration(1800);
+
+        progressLogo.startAnimation(anim);
+    }
+
+    private void stopProgressAnimation() {
+        progressLogo.setAnimation(null);
     }
 }

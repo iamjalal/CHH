@@ -7,6 +7,9 @@
         android:id="@+id/tweet_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"/>
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="4dp"/>
 
 </LinearLayout>

@@ -23,6 +23,7 @@ import com.jalals.test.fragment.adapter.TweetsAdapter;
 import com.jalals.test.model.Twitter;
 import com.jalals.test.twitter.TweetsRequest;
 import com.jalals.test.ui_data.Tweet;
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -55,8 +56,11 @@ public class TweetsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_tweets, container, false);
 
         adapter = new TweetsAdapter(getActivity());
+        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(adapter);
+
         ListView tweetList = (ListView) view.findViewById(R.id.tweet_list);
-        tweetList.setAdapter(adapter);
+        animationAdapter.setAbsListView(tweetList);
+        tweetList.setAdapter(animationAdapter);
 
         loadTweets(Twitter.Values.SCREEN_NAME);
         return view;
