@@ -1,6 +1,10 @@
 package com.jalals.test.app;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -16,6 +20,8 @@ public class AppController extends Application {
 
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
+
+    private OnConnectionErrorListener mConnectionErrorListener;
 
     private static AppController mInstance;
 
@@ -47,7 +53,32 @@ public class AppController extends Application {
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
+
         req.setTag(TAG);
-        getRequestQueue().add(req);
+        if(isConnected()) {
+            getRequestQueue().add(req);
+        }
+        else {
+            mConnectionErrorListener.onConnectionError();
+        }
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void setConnectionErrorListener(OnConnectionErrorListener listener) {
+        mConnectionErrorListener = listener;
+    }
+
+    public interface OnConnectionErrorListener {
+        public void onConnectionError();
     }
 }

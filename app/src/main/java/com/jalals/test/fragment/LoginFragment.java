@@ -1,5 +1,6 @@
 package com.jalals.test.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -26,7 +28,7 @@ import com.jalals.test.twitter.TokenRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends Fragment implements View.OnClickListener, AppController.OnConnectionErrorListener {
 
     private ImageView mProgressLogo;
     private TextView mAuthMessage;
@@ -36,6 +38,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        AppController.getInstance().setConnectionErrorListener(this);
     }
 
     @Override
@@ -82,7 +90,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                             saveToken(token);
                             stopProgressAnimation();
-                            mAuthMessage.setText(getResources().getText(R.string.login_progress));
+                            mAuthMessage.setText(getResources().getText(R.string.login_successful));
 
                             ((MainActivity)getActivity()).showTweetsFragment();
                         }
@@ -95,13 +103,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        stopProgressAnimation();
+                        onConnectionError();
                         error.printStackTrace();
                     }
                 }
         );
 
         AppController.getInstance().addToRequestQueue(request);
+
     }
 
     private void saveToken(String token) {
@@ -124,5 +133,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private void stopProgressAnimation() {
         mProgressLogo.setAnimation(null);
+    }
+
+    @Override
+    public void onConnectionError() {
+        Toast.makeText(getActivity(), R.string.error_message, Toast.LENGTH_LONG).show();
+        stopProgressAnimation();
+        mAuthMessage.setText("");
     }
 }

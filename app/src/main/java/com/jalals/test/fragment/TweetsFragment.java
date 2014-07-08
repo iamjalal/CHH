@@ -1,5 +1,6 @@
 package com.jalals.test.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,7 +42,8 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class TweetsFragment extends Fragment implements  OnRefreshListener, EndlessScrollListener.OnEndReachedListener {
+public class TweetsFragment extends Fragment implements  OnRefreshListener,
+        EndlessScrollListener.OnEndReachedListener, AppController.OnConnectionErrorListener {
 
     private static final String TWEET_LIST = "tweetList";
     private static final long LOAD_LATEST = -1;
@@ -48,6 +51,7 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener, Endl
     private PullToRefreshLayout mRootLayout;
     private ListView mTweetList;
     private TweetsAdapter mAdapter;
+
     private EndlessScrollListener mScrollListener;
 
     private List<Tweet> mTweets = new ArrayList<Tweet>();
@@ -57,6 +61,12 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener, Endl
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        AppController.getInstance().setConnectionErrorListener(this);
     }
 
     @Override
@@ -147,9 +157,7 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener, Endl
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(mRootLayout.isRefreshing()) {
-                    mRootLayout.setRefreshComplete();
-                }
+                onConnectionError();
                 error.printStackTrace();
             }
         }, params, ((MainActivity)getActivity()).getAccessToken());
@@ -209,5 +217,13 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener, Endl
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putParcelableArrayList(TWEET_LIST,
                 mAdapter != null ? new ArrayList<Tweet>(mAdapter.getEntries()) : new ArrayList<Tweet>());
+    }
+
+    @Override
+    public void onConnectionError() {
+        Toast.makeText(getActivity(), R.string.error_message, Toast.LENGTH_LONG).show();
+        if(mRootLayout.isRefreshing()) {
+            mRootLayout.setRefreshComplete();
+        }
     }
 }

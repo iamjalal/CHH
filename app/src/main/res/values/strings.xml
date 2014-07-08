@@ -4,6 +4,7 @@
     <string name="app_name">Creative HotHouse</string>
     <string name="login_progress">Logging in...</string>
     <string name="login_successful">Authenticated!</string>
+    <string name="error_message">Oops... It seems you are not online</string>
 
     <string name="logout">Logout</string>
 
