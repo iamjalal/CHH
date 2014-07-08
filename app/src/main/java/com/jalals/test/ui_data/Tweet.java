@@ -14,23 +14,23 @@ public class Tweet implements Parcelable {
         private static final String TEXT = "text";
     }
 
-    private String mId;
+    private long mId;
     private User mUser;
     private String mText;
 
     public Tweet(JSONObject jsonObject) {
-        mId = jsonObject.optString(JSON_ATTR.ID);
+        mId = jsonObject.optLong(JSON_ATTR.ID);
         mUser = new User(jsonObject.optJSONObject(JSON_ATTR.USER));
         mText = jsonObject.optString(JSON_ATTR.TEXT);
     }
 
     public Tweet(Parcel in) {
-        mId = in.readString();
+        mId = in.readLong();
         mUser = in.readParcelable(User.class.getClassLoader());
         mText = in.readString();
     }
 
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
@@ -49,7 +49,7 @@ public class Tweet implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
+        dest.writeLong(mId);
         dest.writeParcelable(mUser, flags);
         dest.writeString(mText);
     }

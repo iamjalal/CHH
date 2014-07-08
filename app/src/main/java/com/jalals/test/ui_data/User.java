@@ -17,23 +17,23 @@ public class User implements Parcelable {
         private static final String IMAGE_URL = "profile_image_url";
     }
 
-    private String mId;
+    private long mId;
     private String mName;
     private String mImageUrl;
 
     public User(JSONObject jsonObject) {
-        mId = jsonObject.optString(JSON_ATTR.ID);
+        mId = jsonObject.optLong(JSON_ATTR.ID);
         mName = jsonObject.optString(JSON_ATTR.NAME);
         mImageUrl = jsonObject.optString(JSON_ATTR.IMAGE_URL);
     }
 
     public User(Parcel in) {
-        mId = in.readString();
+        mId = in.readLong();
         mName = in.readString();
         mImageUrl = in.readString();
     }
 
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
@@ -52,7 +52,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
+        dest.writeLong(mId);
         dest.writeString(mName);
         dest.writeString(mImageUrl);
     }

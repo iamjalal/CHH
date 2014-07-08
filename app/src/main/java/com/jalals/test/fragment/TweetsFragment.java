@@ -2,6 +2,7 @@ package com.jalals.test.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import com.jalals.test.fragment.adapter.TweetsAdapter;
 import com.jalals.test.model.Twitter;
 import com.jalals.test.twitter.TweetsRequest;
 import com.jalals.test.ui_data.Tweet;
+import com.jalals.test.util.EndlessScrollListener;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
 import org.apache.http.NameValuePair;
@@ -29,20 +31,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class TweetsFragment extends Fragment implements  OnRefreshListener {
+public class TweetsFragment extends Fragment implements  OnRefreshListener, EndlessScrollListener.OnEndReachedListener {
 
     private static final String TWEET_LIST = "tweetList";
+    private static final long LOAD_LATEST = -1;
 
     private PullToRefreshLayout mRootLayout;
+    private ListView mTweetList;
     private TweetsAdapter mAdapter;
+    private EndlessScrollListener mScrollListener;
 
-    private List<Tweet> mTweets;
+    private List<Tweet> mTweets = new ArrayList<Tweet>();
 
     public static TweetsFragment newInstance() {
         TweetsFragment fragment = new TweetsFragment();
@@ -66,26 +74,30 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tweets, container, false);
 
-        mAdapter = new TweetsAdapter(getActivity());
-        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
-
-        ListView tweetList = (ListView) view.findViewById(R.id.tweet_list);
-        animationAdapter.setAbsListView(tweetList);
-        tweetList.setAdapter(animationAdapter);
-
         mRootLayout = (PullToRefreshLayout) view.findViewById(R.id.root_layout);
-
         ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
                 .listener(this).setup(mRootLayout);
 
-        if(mTweets == null) {
-            loadTweets();
+        mTweetList = (ListView) view.findViewById(R.id.tweet_list);
+        mScrollListener = new EndlessScrollListener();
+        mScrollListener.setOnEndReachedListener(this);
+        mTweetList.setOnScrollListener(mScrollListener);
+
+        setListAdapter();
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(mTweets.isEmpty()) {
+            loadTweets(LOAD_LATEST);
         }
         else {
             updateUi();
         }
-
-        return view;
     }
 
     @Override
@@ -104,12 +116,16 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadTweets() {
+    private void loadTweets(long maxId) {
 
         mRootLayout.setRefreshing(true);
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair(Twitter.JSON.SCREEN_NAME, Twitter.Values.SCREEN_NAME));
+
+        if(maxId != LOAD_LATEST) {
+            params.add(new BasicNameValuePair(Twitter.JSON.MAX_ID, String.valueOf(maxId)));
+        }
 
         JsonArrayRequest request = new TweetsRequest(Twitter.URLs.TWEETS_URL,
             new Response.Listener<JSONArray>() {
@@ -143,13 +159,10 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener {
 
     private void parseTweets(JSONArray response) throws JSONException {
 
-        mTweets = new ArrayList<Tweet>();
-        mAdapter.setEntries(mTweets);
-
         int count = response != null ? response.length() : 0;
         for(int i = 0; i < count; i++) {
             Tweet tweet = new Tweet(response.getJSONObject(i));
-            mTweets.add(tweet);
+            mAdapter.add(tweet);
         }
     }
 
@@ -164,19 +177,37 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener {
     private void updateUi() {
 
         if(mAdapter == null) {
-            mAdapter = new TweetsAdapter(getActivity());
+            setListAdapter();
         }
 
         mAdapter.setEntries(mTweets);
     }
 
+    private void setListAdapter() {
+        mAdapter = new TweetsAdapter(getActivity());
+        SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+        animationAdapter.setAbsListView(mTweetList);
+        mTweetList.setAdapter(animationAdapter);
+    }
+
     @Override
     public void onRefreshStarted(View view) {
-        loadTweets();
+        setListAdapter();
+        mScrollListener.onRefresh();
+        loadTweets(LOAD_LATEST);
+    }
+
+    @Override
+    public void onEndReached() {
+        if(mAdapter != null && mAdapter.getCount() > 0) {
+            long maxId = mAdapter.getItem(mAdapter.getCount() - 1).getId() - 1;
+            loadTweets(maxId);
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelableArrayList(TWEET_LIST, new ArrayList<Tweet>(mTweets));
+        savedInstanceState.putParcelableArrayList(TWEET_LIST,
+                mAdapter != null ? new ArrayList<Tweet>(mAdapter.getEntries()) : new ArrayList<Tweet>());
     }
 }

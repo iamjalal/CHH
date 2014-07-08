@@ -30,9 +30,17 @@ public class TweetsAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public List<Tweet> getEntries() {
+        return mTweets;
+    }
+
     public void add(Tweet tweet) {
         mTweets.add(tweet);
         notifyDataSetChanged();
+    }
+
+    public void clear() {
+        clear();
     }
 
     @Override
