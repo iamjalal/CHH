@@ -12,6 +12,11 @@ import java.util.Map;
 
 public class TokenRequest extends StringRequest {
 
+    private static final String GRANT_TYPE = "grant_type";
+    private static final String CLIENT_CREDENTIALS = "client_credentials";
+    private static final String AUTH_HEADER = "Authorization";
+    private static final String BASIC_AUTH = "Basic ";
+
     public TokenRequest(int method, String url, Response.Listener<String> listener,
                  Response.ErrorListener errorListener) {
         super(method, url, listener, errorListener);
@@ -20,19 +25,19 @@ public class TokenRequest extends StringRequest {
     @Override
     protected Map<String, String> getParams() throws AuthFailureError {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("grant_type", "client_credentials");
+        params.put(GRANT_TYPE, CLIENT_CREDENTIALS);
         return params;
     }
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> headers = new HashMap<String, String>();
-        String auth = "Basic " + Base64.encodeToString((Twitter.Values.API_KEY
+        String auth = BASIC_AUTH + Base64.encodeToString((Twitter.Values.API_KEY
                         + ":" + Twitter.Values.API_SECRET).getBytes(),
                 Base64.NO_WRAP
         );
 
-        headers.put("Authorization", auth);
+        headers.put(AUTH_HEADER, auth);
         return headers;
     }
 }

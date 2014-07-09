@@ -39,10 +39,6 @@ public class TweetsAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void clear() {
-        clear();
-    }
-
     @Override
     public int getCount() {
         return mTweets.size();
