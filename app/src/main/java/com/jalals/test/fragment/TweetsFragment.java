@@ -3,7 +3,6 @@ package com.jalals.test.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,10 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
@@ -201,7 +197,7 @@ public class TweetsFragment extends Fragment implements  OnRefreshListener,
     @Override
     public void onRefreshStarted(View view) {
         setListAdapter();
-        mScrollListener.onRefresh();
+        mScrollListener.reset();
         loadTweets(LOAD_LATEST);
     }
 

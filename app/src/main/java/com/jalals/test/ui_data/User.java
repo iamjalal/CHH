@@ -3,9 +3,6 @@ package com.jalals.test.ui_data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import com.jalals.test.model.Twitter;
 
 import org.json.JSONObject;
 

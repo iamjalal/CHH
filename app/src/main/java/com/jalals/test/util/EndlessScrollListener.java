@@ -1,6 +1,5 @@
 package com.jalals.test.util;
 
-import android.util.Log;
 import android.widget.AbsListView;
 
 /**
@@ -42,7 +41,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener {
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
 
-    public void onRefresh() {
+    public void reset() {
         previousTotal = 0;
     }
 
